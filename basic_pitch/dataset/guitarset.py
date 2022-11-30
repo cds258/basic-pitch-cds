@@ -23,12 +23,17 @@ import sys
 import time
 from typing import List, Tuple, Optional
 
+sys.path.append('/content/basic-pitch/')
+
+sys.path.append('/content/basic-pitch/basic_pitch/')
+sys.path.append('/content/')
+
 import apache_beam as beam
 import mirdata
 
 from basic_pitch.dataset import commandline, pipeline
 
-GUITARSET_DIR = "GuitarSet"
+GUITARSET_DIR = "/mir_datasets/GuitarSet"
 
 
 class GuitarSetInvalidTracks(beam.DoFn):
@@ -41,7 +46,7 @@ class GuitarSetToTfExample(beam.DoFn):
     DOWNLOAD_ATTRIBUTES = ["audio_mic_path", "jams_path"]
 
     def __init__(self, source: str):
-        self.source = source
+        self.source = '/content/'
 
     def setup(self):
         import apache_beam as beam
