@@ -22,9 +22,12 @@ from datetime import datetime
 from typing import List
 
 import sys
+import pathlib
 
 import numpy as np
 import tensorflow as tf
+
+import tensorflow_model_optimization as tfmot
 
 sys.path.append('/content/')
 
@@ -159,6 +162,8 @@ def main(
     )
 
 
+
+
 def console_entry_point():
 
     """From pip installed script."""
@@ -267,3 +272,41 @@ def console_entry_point():
 
 if __name__ == "__main__":
     console_entry_point()
+
+
+def make_quant():
+
+    quantize_model = tfmot.quantization.keras.quantize_model
+    # q_aware stands for for quantization aware.
+    q_aware_model = quantize_model(base_model)
+
+    # `quantize_model` requires a recompile.
+    q_aware_model.compile(optimizer='adam',
+              loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+              metrics=['accuracy'])
+
+    q_aware_model.summary()
+
+    q_aware_model.fit(train_ds[0:1000], train_labels_subset,
+                  batch_size=500, epochs=1, validation_split=0.1)
+
+
+    converter = tf.lite.TFLiteConverter.from_keras_model(q_aware_model)
+    converter.optimizations = [tf.lite.Optimize.DEFAULT]
+    converter.representative_dataset = audio_windowed_test
+
+    converter.target_spec.supported_ops = [tf.lite.OpsSet.TFLITE_BUILTINS_INT8]
+    converter.inference_input_type = tf.int8  # or tf.uint8
+    converter.inference_output_type = tf.int8  # or tf.uint8
+
+    tflite_model_quant = converter.convert()
+
+
+    tflite_models_dir = pathlib.Path("/tflite_models/")
+    tflite_models_dir.mkdir(exist_ok=True, parents=True)
+    
+    # Save the quantized model:
+    tflite_model_quant_file = tflite_models_dir/"model_quant.tflite"
+    tflite_model_quant_file.write_bytes(tflite_model_quant)
+
+    
