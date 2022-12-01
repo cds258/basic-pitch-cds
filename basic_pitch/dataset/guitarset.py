@@ -33,7 +33,7 @@ import mirdata
 
 from basic_pitch.dataset import commandline, pipeline
 
-GUITARSET_DIR = "/mir_datasets/GuitarSet"
+GUITARSET_DIR = "/content/tdata/GuitarSet"
 
 
 class GuitarSetInvalidTracks(beam.DoFn):
@@ -46,7 +46,7 @@ class GuitarSetToTfExample(beam.DoFn):
     DOWNLOAD_ATTRIBUTES = ["audio_mic_path", "jams_path"]
 
     def __init__(self, source: str):
-        self.source = '/content/'
+        self.source = '/content/mir_datasets/'
 
     def setup(self):
         import apache_beam as beam

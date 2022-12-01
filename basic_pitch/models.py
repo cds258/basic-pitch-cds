@@ -168,7 +168,59 @@ def get_cqt(inputs: tf.Tensor, n_harmonics: int, use_batchnorm: bool) -> tf.Tens
     if use_batchnorm:
         x = tfkl.BatchNormalization()(x)
     return x
+    
+def mini_model(extra_layer: bool = False) -> tf.keras.Model:
 
+  inputs = tf.keras.Input(shape=(AUDIO_N_SAMPLES, 1))
+  x = get_cqt(inputs, 8, True)
+
+  x = nn.HarmonicStacking(CONTOURS_BINS_PER_SEMITONE, 
+                        [0.5] + list(range(1, 8)), 
+                        N_FREQ_BINS_CONTOURS,)(x)
+  if (extra_layer):
+    x_conv1 = tfkl.Conv2D(
+        32, # number of filters
+        (5,5),
+        padding="same",
+        kernel_initializer=_initializer(),
+        kernel_constraint=_kernel_constraint(),
+    )(x)
+
+    x_conv1 = tfkl.BatchNormalization()(x_conv1)
+    x_conv1 = tfkl.ReLU()(x_conv1)
+
+  else:
+    x_conv1 = x
+
+  
+  # x, not x_conv1? whats going on here?
+  # Potential typo in original basic_pitch code
+  # test if first layer necessary or even included
+  x_conv2 = tfkl.Conv2D(
+        8,
+        (3, 3 * 13),
+        padding="same",
+        kernel_initializer=_initializer(),
+        kernel_constraint=_kernel_constraint(),
+    )(x_conv1)
+
+  x_conv2 = tfkl.BatchNormalization()(x_conv2)
+  x_conv2 = tfkl.ReLU()(x_conv2)
+
+  x_conv3 = tfkl.Conv2D(
+      1,
+      (5,5),
+      padding="same",
+      activation="sigmoid",
+      kernel_initializer=_initializer(),
+      kernel_constraint=_kernel_constraint(),
+  )(x_conv2)
+
+  x_conv3 = nn.FlattenFreqCh(name='contours')(x_conv3)
+
+  outputs = {"contours": x_conv3}
+
+  return tf.keras.Model(inputs=inputs, outputs=outputs)
 
 def model(
     n_harmonics: int = 8,

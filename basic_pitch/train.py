@@ -21,8 +21,16 @@ import logging
 from datetime import datetime
 from typing import List
 
+import sys
+
 import numpy as np
 import tensorflow as tf
+
+sys.path.append('/content/')
+
+sys.path.append('/content/basic-pitch/')
+
+sys.path.append('/mir_datasets/')
 
 from basic_pitch import models
 from basic_pitch.callbacks import VisualizeCallback
@@ -65,9 +73,11 @@ def main(
     logging.info(f"no_contours: {no_contours}")
     logging.info(f"weighted_onset_loss: {weighted_onset_loss}")
     logging.info(f"positive_onset_weight: {positive_onset_weight}")
+    
 
+    output = ('/content/out_t/')
     # model
-    model = models.model(no_contours=no_contours)
+    model = models.mini_model()
     input_shape = list(model.input_shape)
     if input_shape[0] is None:
         input_shape[0] = batch_size
@@ -99,6 +109,8 @@ def main(
     )
 
     timestamp = datetime.utcnow().strftime("%Y%m%d-%H%M")
+    print(output)
+    
     tensorboard_log_dir = os.path.join(output, timestamp, "tensorboard")
     callbacks = [
         tf.keras.callbacks.TensorBoard(log_dir=tensorboard_log_dir, histogram_freq=1),
@@ -132,6 +144,9 @@ def main(
     logging.info("--- Model Training specs ---")
     logging.info("  train_ds: {train_ds}")
     logging.info("  validation_ds: {validation_ds}")
+
+    print(train_ds)
+    print(validation_ds)
     model.summary()
 
     model.fit(

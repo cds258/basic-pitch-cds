@@ -668,9 +668,10 @@ def to_transcription_training_input(audio, onsets, contour, notes, onset_weight,
     return (
         audio,
         {
-            "onset": tf.ensure_shape(onsets, (ANNOT_N_FRAMES, N_FREQ_BINS_NOTES)),
+            #"onset": tf.ensure_shape(onsets, (ANNOT_N_FRAMES, N_FREQ_BINS_NOTES)),
             "contour": tf.ensure_shape(contour, (ANNOT_N_FRAMES, N_FREQ_BINS_CONTOURS)),
-            "note": tf.ensure_shape(notes, (ANNOT_N_FRAMES, N_FREQ_BINS_NOTES)),
+            #"note": tf.ensure_shape(notes, (ANNOT_N_FRAMES, N_FREQ_BINS_NOTES)),
         },
-        {"onset": onset_weight, "contour": contour_weight, "note": note_weight},
+        {"contour": contour_weight},
+        #{"onset": onset_weight, "contour": contour_weight, "note": note_weight},
     )

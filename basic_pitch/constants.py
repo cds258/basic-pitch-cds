@@ -37,7 +37,7 @@ ANNOTATIONS_FPS = AUDIO_SAMPLE_RATE // FFT_HOP
 ANNOTATION_HOP = 1.0 / ANNOTATIONS_FPS
 
 # ANNOT_N_TIME_FRAMES is the number of frames in the time-frequency representations we compute
-ANNOT_N_FRAMES = ANNOTATIONS_FPS * AUDIO_WINDOW_LENGTH
+ANNOT_N_FRAMES = 9 #ANNOTATIONS_FPS * AUDIO_WINDOW_LENGTH
 
 # AUDIO_N_SAMPLES is the number of samples in the (clipped) audio that we use as input to the models
 AUDIO_N_SAMPLES = 2048 #AUDIO_SAMPLE_RATE * AUDIO_WINDOW_LENGTH - FFT_HOP
