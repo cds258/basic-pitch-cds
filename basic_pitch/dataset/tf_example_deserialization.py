@@ -293,6 +293,7 @@ def transcription_dataset(file_generator, n_samples_per_track, random_seed):
         - {'contours': contours, 'notes': notes, 'onsets': onsets}
     contours has shape (ANNOT_N_FRAMES, N_FREQ_BINS_CONTOURS)
     notes and onsets have shape: (ANNOT_N_FRAMES, N_FREQ_BINS_NOTES)
+    FIXME remove notes and onsets
     """
     ds = tf.data.Dataset.from_generator(file_generator, output_types=tf.string, output_shapes=())
     ds = tf.data.TFRecordDataset(ds)
